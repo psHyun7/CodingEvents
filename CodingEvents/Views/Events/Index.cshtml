@@ -28,6 +28,8 @@ else
     <tr>
         <th>Id#</th>
         <th>Name</th>
+        <th>Location</th>
+        <th>Number of Attendees</th>
         <th>Description</th>
         <th>Contact Email</th>
     </tr>
@@ -36,6 +38,8 @@ else
     <tr>
         <td>@evt.Id</td>
         <td>@evt.Name</td>
+        <td>@evt.Location</td>
+        <td>@evt.NumAttendees</td>
         <td>@evt.Description</td>
         <td>@evt.ContactEmail</td>
         <td><a asp-controller="Events" asp-action="Edit" asp-route-eventid="@evt.Id">Edit Event</a></td>

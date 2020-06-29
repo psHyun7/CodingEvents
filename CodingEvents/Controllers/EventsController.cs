@@ -37,6 +37,8 @@ namespace CodingEvents.Controllers
                 Event newEvent = new Event
                 {
                     Name = addEventViewModel.Name,
+                    Location = addEventViewModel.Location,
+                    NumAttendees = addEventViewModel.NumAttendees,
                     Description = addEventViewModel.Description,
                     ContactEmail = addEventViewModel.ContactEmail
                 };
