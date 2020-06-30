@@ -40,6 +40,7 @@ namespace CodingEvents.Controllers
                     Location = addEventViewModel.Location,
                     NumAttendees = addEventViewModel.NumAttendees,
                     Description = addEventViewModel.Description,
+                    Type = addEventViewModel.Type,
                     ContactEmail = addEventViewModel.ContactEmail
                 };
 
@@ -52,8 +53,8 @@ namespace CodingEvents.Controllers
 
         public IActionResult Delete()
         {
-            ViewBag.events = EventData.GetAll();
-            return View();
+            List<Event> events = new List<Event>(EventData.GetAll());
+            return View(events);
         }
 
         [HttpPost]

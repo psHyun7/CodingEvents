@@ -1,14 +1,40 @@
-﻿<h1>Delete Events</h1>
+﻿@using CodingEvents.Models
+
+@model List<Event>
+
+<h1>Delete Events</h1>
 
 <form method="post">
-    @foreach(var evt in ViewBag.events)
-    {
-        <div class="form-group">
-            <label>
-                <input type="checkbox" name="eventIds" value="@evt.Id" />
-                <span>@evt.Name</span>
-            </label>
-        </div>
-    }
+    <div class="form-group">
+        <table class="table">
+            <tr>
+                <th>Delete</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Number of Attendees</th>
+                <th>Description</th>
+                <th>Event Type</th>
+                <th>Contact Email</th>
+            </tr>
+            @foreach (var evt in Model)
+            {
+                <tr>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="eventIds" value="@evt.Id" />
+                            <span>@evt.Name</span>
+                        </label>
+                    </td>
+                    <td>@evt.Name</td>
+                    <td>@evt.Location</td>
+                    <td>@evt.NumAttendees</td>
+                    <td>@evt.Description</td>
+                    <td>@evt.Type</td>
+                    <td>@evt.ContactEmail</td>
+                    <td><a asp-controller="Events" asp-action="Edit" asp-route-eventid="@evt.Id">Edit Event</a></td>
+                </tr>
+            }
+        </table>
+    </div>
     <input type="submit" value="Delete Selected Events" class="btn btn-danger" />
 </form>
