@@ -79,11 +79,15 @@ namespace CodingEvents.Controllers
 
         [HttpPost]
         [Route("/Events/Edit")]
-        public IActionResult SubmitEditEventForm(int eventId, string name, string description)
+        public IActionResult SubmitEditEventForm(int eventId, string name, string location, int numAttendees, string description, EventType eventType, string email)
         {
             Event eventToEdit = EventData.GetById(eventId);
             eventToEdit.Name = name;
+            eventToEdit.Location = location;
+            eventToEdit.NumAttendees = numAttendees;
             eventToEdit.Description = description;
+            eventToEdit.Type = eventType;
+            eventToEdit.ContactEmail = email;
             return Redirect("/Events");
         }
     }
