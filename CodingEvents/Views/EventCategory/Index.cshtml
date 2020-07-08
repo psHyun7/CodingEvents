@@ -14,22 +14,6 @@
 {
     <p>No Event Categories Found!</p>
 }
-else
-{
-    <table class="table">
-        <tr>
-            <th>Id</th>
-            <th>Name</th>
-        </tr>
-        @foreach (var eventCategory in Model)
-        {
-            <tr>
-                <th>@eventCategory.Id</th>
-                <th>@eventCategory.Name</th>
-            </tr>
-        }
-    </table>
-}
 
 <div>
     <table class="table">
