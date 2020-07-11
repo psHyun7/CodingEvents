@@ -6,6 +6,8 @@ using CodingEvents.Data;
 using CodingEvents.Models;
 using CodingEvents.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodingEvents.Controllers
 {
@@ -23,7 +25,9 @@ namespace CodingEvents.Controllers
         public IActionResult Index()
         {
             //List<Event> events = new List<Event>(EventData.GetAll());
-            List<Event> events = context.Events.ToList();
+            List<Event> events = context.Events
+                .Include(e => e.Category)
+                .ToList();
 
             return View(events);
         }
@@ -31,7 +35,8 @@ namespace CodingEvents.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            AddEventViewModel addEventViewModel = new AddEventViewModel();
+            List<EventCategory> categories = context.EventCategories.ToList();
+            AddEventViewModel addEventViewModel = new AddEventViewModel(categories);
 
             return View(addEventViewModel);
         }
@@ -41,13 +46,15 @@ namespace CodingEvents.Controllers
         {
             if (ModelState.IsValid)
             {
+                EventCategory theCategory = context.EventCategories.Find(addEventViewModel.CategoryId);
                 Event newEvent = new Event
                 {
                     Name = addEventViewModel.Name,
                     Location = addEventViewModel.Location,
                     NumAttendees = addEventViewModel.NumAttendees,
                     Description = addEventViewModel.Description,
-                    Type = addEventViewModel.Type,
+                    //Type = addEventViewModel.Type,
+                    Category = theCategory,
                     ContactEmail = addEventViewModel.ContactEmail
                 };
 
@@ -57,13 +64,25 @@ namespace CodingEvents.Controllers
                 return Redirect("/Events");
             }
 
+            List<EventCategory> categories = context.EventCategories.ToList();
+            addEventViewModel.Categories = new List<SelectListItem>();
+            foreach (var category in categories)
+            {
+                addEventViewModel.Categories.Add(new SelectListItem
+                {
+                    Value = category.Id.ToString(),
+                    Text = category.Name
+                });
+            }
             return View(addEventViewModel);
         }
 
         public IActionResult Delete()
         {
             //List<Event> events = new List<Event>(EventData.GetAll());
-            List<Event> events = context.Events.ToList();
+            List<Event> events = context.Events
+                .Include(e => e.Category)
+                .ToList();
             return View(events);
         }
 
@@ -81,31 +100,63 @@ namespace CodingEvents.Controllers
             return Redirect("/Events");
         }
 
+        [HttpGet]
         [Route("/Events/Edit/{eventId?}")]
         public IActionResult Edit(int eventId)
         {
-            //Event eventToEdit = EventData.GetById(eventId);
-            Event eventToEdit = context.Events.Find(eventId);
-            ViewBag.title = $"Edit Event {eventToEdit.Name} (id={eventToEdit.Id})";
-            ViewBag.eventToEdit = eventToEdit;
-            return View();
+            if (eventId != 0)
+            {
+                //Event eventToEdit = EventData.GetById(eventId);
+                Event eventToEdit = context.Events.Find(eventId);
+                List<EventCategory> categories = context.EventCategories.ToList();
+                EditEventViewModel editEventViewModel = new EditEventViewModel(categories);
+                editEventViewModel.IdForEditEvent = eventId;
+                editEventViewModel.Name = eventToEdit.Name;
+                editEventViewModel.Location = eventToEdit.Location;
+                editEventViewModel.NumAttendees = eventToEdit.NumAttendees;
+                editEventViewModel.Description = eventToEdit.Description;
+                editEventViewModel.ContactEmail = eventToEdit.ContactEmail;
+                editEventViewModel.CategoryId = eventToEdit.CategoryId;
+                ViewBag.title = $"Edit Event {eventToEdit.Name} (id={eventToEdit.Id})";
+                return View(editEventViewModel);
+            }
+            else
+            {
+                return Redirect("/Events");
+            }
         }
 
         [HttpPost]
-        [Route("/Events/Edit")]
-        public IActionResult SubmitEditEventForm(int eventId, string name, string location, int numAttendees, string description, EventType eventType, string email)
+        [Route("/Events/Edit/{eventId?}")]
+        public IActionResult SubmitEditEventForm(EditEventViewModel editEventViewModel)
         {
-            //Event eventToEdit = EventData.GetById(eventId);
-            Event eventToEdit = context.Events.Find(eventId);
-            eventToEdit.Name = name;
-            eventToEdit.Location = location;
-            eventToEdit.NumAttendees = numAttendees;
-            eventToEdit.Description = description;
-            eventToEdit.Type = eventType;
-            eventToEdit.ContactEmail = email;
-            context.Events.Update(eventToEdit);
-            context.SaveChanges();
-            return Redirect("/Events");
+            if (ModelState.IsValid)
+            {
+                EventCategory theCategory = context.EventCategories.Find(editEventViewModel.CategoryId);
+                Event eventToEdit = context.Events.Find(editEventViewModel.IdForEditEvent);
+                eventToEdit.Name = editEventViewModel.Name;
+                eventToEdit.Location = editEventViewModel.Location;
+                eventToEdit.NumAttendees = editEventViewModel.NumAttendees;
+                eventToEdit.Description = editEventViewModel.Description;
+                //Type = addEventViewModel.Type,
+                eventToEdit.Category = theCategory;
+                eventToEdit.ContactEmail = editEventViewModel.ContactEmail;
+
+                context.SaveChanges();
+                return Redirect("/Events");
+            }
+
+            List<EventCategory> categories = context.EventCategories.ToList();
+            editEventViewModel.Categories = new List<SelectListItem>();
+            foreach (var category in categories)
+            {
+                editEventViewModel.Categories.Add(new SelectListItem
+                {
+                    Value = category.Id.ToString(),
+                    Text = category.Name
+                });
+            }
+            return View("/Events/Edit", editEventViewModel);
         }
     }
 }
