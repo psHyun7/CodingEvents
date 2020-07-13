@@ -1,4 +1,5 @@
 ﻿using CodingEvents.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace CodingEvents.Data
     {
         public DbSet<Event> Events { get; set; }
         public DbSet<EventCategory> EventCategories { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         public EventDbContext(DbContextOptions<EventDbContext> options) : base(options)
         {
